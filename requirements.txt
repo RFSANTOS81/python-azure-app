@@ -1,2 +1,7 @@
-flask
-gunicorn
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+pydantic
+python-dotenv
+httpx2
