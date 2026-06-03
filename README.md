@@ -32,7 +32,7 @@ No Azure, é comum precisar codificar caracteres especiais no usuário e na senh
 Exemplo seguro:
 
 ```text
-DATABASE_URL=postgresql://adminopet%40ads:opet%40123@ads.postgres.database.azure.com:5432/postgres?sslmode=require
+DATABASE_URL=postgresql://<USER_ENCODED>:<PASSWORD_ENCODED>@<HOST>:5432/<DBNAME>?sslmode=require
 ```
 
 ## Publicar no GitHub
