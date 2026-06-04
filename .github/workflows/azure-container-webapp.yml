@@ -29,6 +29,7 @@ name: Build and deploy a container to Azure Web App
 env:
   AZURE_WEBAPP_NAME: webappccx
   ACR_NAME: containerccx
+  ACR_LOGIN_SERVER: containerccx-dxasgqf7e8adhfrd.azurecr.io
   IMAGE_NAME: minha-app
 
 on:
@@ -49,20 +50,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login no Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Verificar ACR
+        run: |
+          az acr show --name $ACR_NAME
+          echo "Login Server: $ACR_LOGIN_SERVER"
+
       - name: Login no ACR
-        run: az acr login --name $ACR_NAME
+        run: |
+          az acr login --name $ACR_NAME
 
       - name: Build da imagem Docker
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest .
+          docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:latest .
 
       - name: Push da imagem para o ACR
         run: |
-          docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:latest
+          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -70,7 +77,7 @@ jobs:
 
     steps:
       - name: Login no Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -78,4 +85,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          images: ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
